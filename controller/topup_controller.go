@@ -27,7 +27,6 @@ func (controller *TopupController) TopupWebhook(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return exception.NewCustomError(http.StatusBadRequest, "Invalid request body")
 	}
-
 	topupDomain, err := mapper.ToTopupDomain(req)
 	if err != nil {
 		return exception.NewCustomError(http.StatusBadRequest, "Invalid amount format")
@@ -35,13 +34,11 @@ func (controller *TopupController) TopupWebhook(c echo.Context) error {
 
 	result, err := controller.TopupService.ProcessWebhook(topupDomain)
 	if err != nil {
-		return exception.NewCustomError(http.StatusInternalServerError, err.Error())
+		return err
 	}
 
 	if result.ID == 0 {
-		return c.JSON(http.StatusOK, web.WebResponse{
-			Message: "Notification ignored - not settlement",
-		})
+		return exception.NewCustomError(http.StatusOK, "Notification ignored - not settlement")
 	}
 
 	topupResponse := mapper.ToTopupResponse(result)

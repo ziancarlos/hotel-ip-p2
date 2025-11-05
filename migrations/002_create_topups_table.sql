@@ -1,4 +1,3 @@
--- Create topups table
 CREATE TABLE IF NOT EXISTS topups (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,

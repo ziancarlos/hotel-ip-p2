@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"hotel_ip-p2/exception"
 	"hotel_ip-p2/helper"
 	"hotel_ip-p2/mapper"
@@ -38,6 +39,10 @@ func (controller *UserController) Register(c echo.Context) error {
 
 	result, err := controller.UserService.Register(user)
 	if err != nil {
+		var customErr *exception.CustomError
+		if errors.As(err, &customErr) {
+			return customErr
+		}
 		return exception.NewCustomError(http.StatusInternalServerError, err.Error())
 	}
 
@@ -62,7 +67,7 @@ func (controller *UserController) Login(c echo.Context) error {
 
 	user, err := controller.UserService.Login(req.Email, req.Password)
 	if err != nil {
-		return exception.NewCustomError(http.StatusUnauthorized, "Invalid credentials")
+		return err
 	}
 
 	token, err := helper.GenerateToken(user.ID)
@@ -85,7 +90,7 @@ func (controller *UserController) GetMe(c echo.Context) error {
 
 	user, err := controller.UserService.GetById(userID)
 	if err != nil {
-		return exception.NewCustomError(http.StatusNotFound, "User not found")
+		return err
 	}
 
 	userResponse := mapper.ToUserResponse(user)
@@ -93,5 +98,11 @@ func (controller *UserController) GetMe(c echo.Context) error {
 	return c.JSON(http.StatusOK, web.WebResponse{
 		Message: "User retrieved successfully",
 		Data:    userResponse,
+	})
+}
+
+func (controller *UserController) GetById(c echo.Context) error {
+	return c.JSON(http.StatusOK, web.WebResponse{
+		Message: "Get user by id",
 	})
 }

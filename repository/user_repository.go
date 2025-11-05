@@ -47,7 +47,11 @@ func (repository *userRepositoryImpl) FindById(db *gorm.DB, id int) (domain.User
 }
 
 func (repository *userRepositoryImpl) Update(db *gorm.DB, user domain.User) (domain.User, error) {
-	err := db.Save(&user).Error
+	err := db.Model(&domain.User{}).Where("id = ?", user.ID).Updates(map[string]interface{}{
+		"name":    user.Name,
+		"email":   user.Email,
+		"balance": user.Balance,
+	}).Error
 	if err != nil {
 		return domain.User{}, err
 	}
