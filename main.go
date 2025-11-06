@@ -18,12 +18,22 @@ func main() {
 	db := helper.InitDB()
 
 	userRepository := repository.NewUserRepository()
-	userService := service.NewUserService(userRepository, db)
-	userController := controller.NewUserController(userService)
-
 	topupRepository := repository.NewTopupRepository()
+	roomTypeRepository := repository.NewRoomTypeRepository()
+	roomRepository := repository.NewRoomRepository()
+	bookRoomRepository := repository.NewBookRoomRepository()
+
+	userService := service.NewUserService(userRepository, db)
 	topupService := service.NewTopupService(topupRepository, userRepository, db)
+	roomTypeService := service.NewRoomTypeService(roomTypeRepository, roomRepository, db)
+	roomService := service.NewRoomService(roomRepository, roomTypeRepository, db)
+	bookRoomService := service.NewBookRoomService(bookRoomRepository, roomRepository, userRepository, db)
+
+	userController := controller.NewUserController(userService)
 	topupController := controller.NewTopupController(topupService)
+	roomTypeController := controller.NewRoomTypeController(roomTypeService)
+	roomController := controller.NewRoomController(roomService)
+	bookRoomController := controller.NewBookRoomController(bookRoomService)
 
 	e := echo.New()
 
@@ -36,6 +46,9 @@ func main() {
 
 	api := e.Group("/api")
 	route.UserRoutes(api, userController, topupController)
+	route.RoomTypeRoutes(api, roomTypeController)
+	route.RoomRoutes(api, roomController)
+	route.BookRoomRoutes(api, bookRoomController)
 
 	port := ":8080"
 	log.Printf("Server starting on port %s", port)
