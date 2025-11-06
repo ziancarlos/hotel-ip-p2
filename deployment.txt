@@ -1,0 +1,1 @@
+https://hotel-ip-p2-production.up.railway.app/swagger/index.html
