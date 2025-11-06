@@ -6,5 +6,6 @@ type TopupWebhookRequest struct {
 	TransactionID     string `json:"transaction_id"`
 	OrderID           string `json:"order_id"`
 	GrossAmount       string `json:"gross_amount"`
+	SignatureKey      string `json:"signature_key"`
 	UserID            int    `json:"user_id"`
 }

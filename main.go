@@ -9,9 +9,31 @@ import (
 	"hotel_ip-p2/service"
 	"log"
 
+	_ "hotel_ip-p2/docs"
+
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
+
+// @title Hotel Booking API
+// @version 1.0
+// @description This is a hotel booking management API server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.email support@hotel.com
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8080
+// @BasePath /api
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
 	helper.InitConfig()
@@ -43,6 +65,8 @@ func main() {
 
 	e.Validator = helper.NewValidator()
 	e.HTTPErrorHandler = middleware.ErrorHandler
+
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	api := e.Group("/api")
 	route.UserRoutes(api, userController, topupController)

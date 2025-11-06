@@ -22,6 +22,18 @@ func NewRoomController(roomService service.RoomService) *RoomController {
 	}
 }
 
+// Create godoc
+// @Summary Create a new room
+// @Description Create a new room
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.RoomRequest true "Room details"
+// @Success 201 {object} web.WebResponse{data=response.RoomResponse} "Room created successfully"
+// @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Router /rooms [post]
 func (controller *RoomController) Create(c echo.Context) error {
 	var req request.RoomRequest
 
@@ -48,6 +60,16 @@ func (controller *RoomController) Create(c echo.Context) error {
 	})
 }
 
+// FindAll godoc
+// @Summary Get all rooms
+// @Description Get a list of all rooms
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} web.WebResponse{data=[]response.RoomResponse} "Rooms retrieved successfully"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Router /rooms [get]
 func (controller *RoomController) FindAll(c echo.Context) error {
 	result, err := controller.RoomService.FindAll()
 	if err != nil {
@@ -62,6 +84,19 @@ func (controller *RoomController) FindAll(c echo.Context) error {
 	})
 }
 
+// FindById godoc
+// @Summary Get room by ID
+// @Description Get a room by its ID
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Room ID"
+// @Success 200 {object} web.WebResponse{data=response.RoomResponse} "Room retrieved successfully"
+// @Failure 400 {object} web.WebResponse "Invalid ID"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "Room not found"
+// @Router /rooms/{id} [get]
 func (controller *RoomController) FindById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -81,6 +116,20 @@ func (controller *RoomController) FindById(c echo.Context) error {
 	})
 }
 
+// Update godoc
+// @Summary Update a room
+// @Description Update an existing room by ID
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Room ID"
+// @Param request body request.RoomRequest true "Updated room details"
+// @Success 200 {object} web.WebResponse{data=response.RoomResponse} "Room updated successfully"
+// @Failure 400 {object} web.WebResponse "Invalid ID or request body"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "Room not found"
+// @Router /rooms/{id} [put]
 func (controller *RoomController) Update(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -113,6 +162,19 @@ func (controller *RoomController) Update(c echo.Context) error {
 	})
 }
 
+// Delete godoc
+// @Summary Delete a room
+// @Description Delete a room by ID
+// @Tags rooms
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Room ID"
+// @Success 200 {object} web.WebResponse "Room deleted successfully"
+// @Failure 400 {object} web.WebResponse "Invalid ID"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "Room not found"
+// @Router /rooms/{id} [delete]
 func (controller *RoomController) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

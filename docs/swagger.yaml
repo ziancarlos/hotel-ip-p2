@@ -1,0 +1,739 @@
+basePath: /api
+definitions:
+  request.BookRoomRequest:
+    properties:
+      date:
+        type: string
+      room_id:
+        type: integer
+    required:
+    - date
+    - room_id
+    type: object
+  request.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  request.RoomRequest:
+    properties:
+      room_number:
+        type: string
+      room_type_id:
+        type: integer
+    required:
+    - room_number
+    - room_type_id
+    type: object
+  request.RoomTypeRequest:
+    properties:
+      name:
+        type: string
+      price:
+        type: number
+    required:
+    - name
+    - price
+    type: object
+  request.TopupWebhookRequest:
+    properties:
+      gross_amount:
+        type: string
+      order_id:
+        type: string
+      status_code:
+        type: string
+      transaction_id:
+        type: string
+      transaction_status:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  request.UserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - name
+    - password
+    type: object
+  response.BookRoomResponse:
+    properties:
+      date:
+        type: string
+      id:
+        type: integer
+      price:
+        type: number
+      room:
+        $ref: '#/definitions/response.RoomResponse'
+      room_id:
+        type: integer
+      user:
+        $ref: '#/definitions/response.UserResponse'
+      user_id:
+        type: integer
+    type: object
+  response.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  response.RoomResponse:
+    properties:
+      id:
+        type: integer
+      room_number:
+        type: string
+      room_type:
+        $ref: '#/definitions/response.RoomTypeResponse'
+      room_type_id:
+        type: integer
+    type: object
+  response.RoomTypeResponse:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  response.TopupResponse:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      id:
+        type: integer
+      midtrans_order_id:
+        type: string
+      midtrans_transaction_id:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  response.UserResponse:
+    properties:
+      balance:
+        type: number
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  web.WebResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@hotel.com
+    name: API Support
+  description: This is a hotel booking management API server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Hotel Booking API
+  version: "1.0"
+paths:
+  /book-rooms:
+    post:
+      consumes:
+      - application/json
+      description: Create a new room booking
+      parameters:
+      - description: Booking details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.BookRoomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Room booked successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.BookRoomResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Book a room
+      tags:
+      - bookings
+  /book-rooms/my-bookings:
+    get:
+      consumes:
+      - application/json
+      description: Get all bookings for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bookings retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.BookRoomResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Get my bookings
+      tags:
+      - bookings
+  /room-types:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all room types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room types retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.RoomTypeResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all room types
+      tags:
+      - room-types
+    post:
+      consumes:
+      - application/json
+      description: Create a new room type
+      parameters:
+      - description: Room type details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RoomTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Room type created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RoomTypeResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new room type
+      tags:
+      - room-types
+  /room-types/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a room type by ID
+      parameters:
+      - description: Room Type ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room type deleted successfully
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: Room type not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a room type
+      tags:
+      - room-types
+    get:
+      consumes:
+      - application/json
+      description: Get a room type by its ID
+      parameters:
+      - description: Room Type ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room type retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RoomTypeResponse'
+              type: object
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: Room type not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Get room type by ID
+      tags:
+      - room-types
+    put:
+      consumes:
+      - application/json
+      description: Update an existing room type by ID
+      parameters:
+      - description: Room Type ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated room type details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RoomTypeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room type updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RoomTypeResponse'
+              type: object
+        "400":
+          description: Invalid ID or request body
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: Room type not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a room type
+      tags:
+      - room-types
+  /rooms:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all rooms
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Rooms retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/response.RoomResponse'
+                  type: array
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Get all rooms
+      tags:
+      - rooms
+    post:
+      consumes:
+      - application/json
+      description: Create a new room
+      parameters:
+      - description: Room details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RoomRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Room created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RoomResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a new room
+      tags:
+      - rooms
+  /rooms/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room deleted successfully
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: Room not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a room
+      tags:
+      - rooms
+    get:
+      consumes:
+      - application/json
+      description: Get a room by its ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RoomResponse'
+              type: object
+        "400":
+          description: Invalid ID
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: Room not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Get room by ID
+      tags:
+      - rooms
+    put:
+      consumes:
+      - application/json
+      description: Update an existing room by ID
+      parameters:
+      - description: Room ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated room details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.RoomRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Room updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.RoomResponse'
+              type: object
+        "400":
+          description: Invalid ID or request body
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: Room not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Update a room
+      tags:
+      - rooms
+  /users/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and get JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.LoginResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      summary: Login user
+      tags:
+      - users
+  /users/me:
+    get:
+      consumes:
+      - application/json
+      description: Get current authenticated user information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User retrieved successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.UserResponse'
+              type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      security:
+      - BearerAuth: []
+      summary: Get current user
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: User registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User registered successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.UserResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      summary: Register a new user
+      tags:
+      - users
+  /users/topup:
+    post:
+      consumes:
+      - application/json
+      description: Process Midtrans payment webhook for user balance topup
+      parameters:
+      - description: Midtrans webhook payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.TopupWebhookRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Topup processed successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/web.WebResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/response.TopupResponse'
+              type: object
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/web.WebResponse'
+      summary: Process topup webhook
+      tags:
+      - topup
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

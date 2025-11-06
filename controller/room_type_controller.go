@@ -22,6 +22,18 @@ func NewRoomTypeController(roomTypeService service.RoomTypeService) *RoomTypeCon
 	}
 }
 
+// Create godoc
+// @Summary Create a new room type
+// @Description Create a new room type
+// @Tags room-types
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.RoomTypeRequest true "Room type details"
+// @Success 201 {object} web.WebResponse{data=response.RoomTypeResponse} "Room type created successfully"
+// @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Router /room-types [post]
 func (controller *RoomTypeController) Create(c echo.Context) error {
 	var req request.RoomTypeRequest
 
@@ -48,6 +60,16 @@ func (controller *RoomTypeController) Create(c echo.Context) error {
 	})
 }
 
+// FindAll godoc
+// @Summary Get all room types
+// @Description Get a list of all room types
+// @Tags room-types
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} web.WebResponse{data=[]response.RoomTypeResponse} "Room types retrieved successfully"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Router /room-types [get]
 func (controller *RoomTypeController) FindAll(c echo.Context) error {
 	result, err := controller.RoomTypeService.FindAll()
 	if err != nil {
@@ -62,6 +84,19 @@ func (controller *RoomTypeController) FindAll(c echo.Context) error {
 	})
 }
 
+// FindById godoc
+// @Summary Get room type by ID
+// @Description Get a room type by its ID
+// @Tags room-types
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Room Type ID"
+// @Success 200 {object} web.WebResponse{data=response.RoomTypeResponse} "Room type retrieved successfully"
+// @Failure 400 {object} web.WebResponse "Invalid ID"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "Room type not found"
+// @Router /room-types/{id} [get]
 func (controller *RoomTypeController) FindById(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -81,6 +116,20 @@ func (controller *RoomTypeController) FindById(c echo.Context) error {
 	})
 }
 
+// Update godoc
+// @Summary Update a room type
+// @Description Update an existing room type by ID
+// @Tags room-types
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Room Type ID"
+// @Param request body request.RoomTypeRequest true "Updated room type details"
+// @Success 200 {object} web.WebResponse{data=response.RoomTypeResponse} "Room type updated successfully"
+// @Failure 400 {object} web.WebResponse "Invalid ID or request body"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "Room type not found"
+// @Router /room-types/{id} [put]
 func (controller *RoomTypeController) Update(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -113,6 +162,19 @@ func (controller *RoomTypeController) Update(c echo.Context) error {
 	})
 }
 
+// Delete godoc
+// @Summary Delete a room type
+// @Description Delete a room type by ID
+// @Tags room-types
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path int true "Room Type ID"
+// @Success 200 {object} web.WebResponse "Room type deleted successfully"
+// @Failure 400 {object} web.WebResponse "Invalid ID"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "Room type not found"
+// @Router /room-types/{id} [delete]
 func (controller *RoomTypeController) Delete(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

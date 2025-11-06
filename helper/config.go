@@ -16,8 +16,9 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	jwtSecretKey   string
-	databaseConfig DatabaseConfig
+	jwtSecretKey      string
+	midtransServerKey string
+	databaseConfig    DatabaseConfig
 }
 
 var AppConfig *Config
@@ -31,7 +32,8 @@ func InitConfig() {
 	}
 
 	AppConfig = &Config{
-		jwtSecretKey: viper.GetString("JWT_SECRET_KEY"),
+		jwtSecretKey:      viper.GetString("JWT_SECRET_KEY"),
+		midtransServerKey: viper.GetString("MIDTRANS_SERVER_KEY"),
 		databaseConfig: DatabaseConfig{
 			Host:     viper.GetString("DB_HOST"),
 			Port:     viper.GetString("DB_PORT"),
@@ -46,6 +48,10 @@ func InitConfig() {
 		log.Fatal("JWT_SECRET_KEY is required")
 	}
 
+	if AppConfig.midtransServerKey == "" {
+		log.Fatal("MIDTRANS_SERVER_KEY is required")
+	}
+
 	log.Println("Configuration loaded successfully")
 }
 
@@ -55,4 +61,8 @@ func (c *Config) GetJWTSecret() string {
 
 func (c *Config) GetDatabaseConfig() DatabaseConfig {
 	return c.databaseConfig
+}
+
+func (c *Config) GetMidtransServerKey() string {
+	return c.midtransServerKey
 }

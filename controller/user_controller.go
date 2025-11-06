@@ -24,6 +24,17 @@ func NewUserController(userService service.UserService) *UserController {
 	}
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Register a new user account
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body request.UserRequest true "User registration details"
+// @Success 201 {object} web.WebResponse{data=response.UserResponse} "User registered successfully"
+// @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
+// @Failure 500 {object} web.WebResponse "Internal server error"
+// @Router /users/register [post]
 func (controller *UserController) Register(c echo.Context) error {
 	var req request.UserRequest
 
@@ -54,6 +65,18 @@ func (controller *UserController) Register(c echo.Context) error {
 	})
 }
 
+// Login godoc
+// @Summary Login user
+// @Description Authenticate user and get JWT token
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param request body request.LoginRequest true "Login credentials"
+// @Success 200 {object} web.WebResponse{data=response.LoginResponse} "Login successful"
+// @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
+// @Failure 401 {object} web.WebResponse "Invalid credentials"
+// @Failure 500 {object} web.WebResponse "Internal server error"
+// @Router /users/login [post]
 func (controller *UserController) Login(c echo.Context) error {
 	var req request.LoginRequest
 
@@ -85,6 +108,17 @@ func (controller *UserController) Login(c echo.Context) error {
 	})
 }
 
+// GetMe godoc
+// @Summary Get current user
+// @Description Get current authenticated user information
+// @Tags users
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} web.WebResponse{data=response.UserResponse} "User retrieved successfully"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Failure 404 {object} web.WebResponse "User not found"
+// @Router /users/me [get]
 func (controller *UserController) GetMe(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 

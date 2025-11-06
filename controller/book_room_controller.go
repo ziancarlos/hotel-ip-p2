@@ -22,6 +22,18 @@ func NewBookRoomController(bookRoomService service.BookRoomService) *BookRoomCon
 	}
 }
 
+// Create godoc
+// @Summary Book a room
+// @Description Create a new room booking
+// @Tags bookings
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body request.BookRoomRequest true "Booking details"
+// @Success 201 {object} web.WebResponse{data=response.BookRoomResponse} "Room booked successfully"
+// @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Router /book-rooms [post]
 func (controller *BookRoomController) Create(c echo.Context) error {
 	var req request.BookRoomRequest
 
@@ -63,6 +75,16 @@ func (controller *BookRoomController) Create(c echo.Context) error {
 	})
 }
 
+// FindByUserId godoc
+// @Summary Get my bookings
+// @Description Get all bookings for the authenticated user
+// @Tags bookings
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Success 200 {object} web.WebResponse{data=[]response.BookRoomResponse} "Bookings retrieved successfully"
+// @Failure 401 {object} web.WebResponse "Unauthorized"
+// @Router /book-rooms/my-bookings [get]
 func (controller *BookRoomController) FindByUserId(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 
