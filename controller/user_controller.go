@@ -9,6 +9,7 @@ import (
 	"hotel_ip-p2/model/web/request"
 	"hotel_ip-p2/model/web/response"
 	"hotel_ip-p2/service"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -34,15 +35,17 @@ func NewUserController(userService service.UserService) *UserController {
 // @Success 201 {object} web.WebResponse{data=response.UserResponse} "User registered successfully"
 // @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
 // @Failure 500 {object} web.WebResponse "Internal server error"
-// @Router /users/register [post]
 func (controller *UserController) Register(c echo.Context) error {
+	log.Println("Request to register new user")
 	var req request.UserRequest
 
 	if err := c.Bind(&req); err != nil {
+		log.Printf("Failed to bind request body: %v", err)
 		return exception.NewCustomError(http.StatusBadRequest, "Invalid request body")
 	}
 
 	if err := c.Validate(&req); err != nil {
+		log.Printf("Validation failed: %v", err)
 		return exception.NewCustomError(http.StatusBadRequest, err.Error())
 	}
 
@@ -50,6 +53,7 @@ func (controller *UserController) Register(c echo.Context) error {
 
 	result, err := controller.UserService.Register(user)
 	if err != nil {
+		log.Printf("Failed to register user: %v", err)
 		var customErr *exception.CustomError
 		if errors.As(err, &customErr) {
 			return customErr
@@ -57,6 +61,7 @@ func (controller *UserController) Register(c echo.Context) error {
 		return exception.NewCustomError(http.StatusInternalServerError, err.Error())
 	}
 
+	log.Printf("User registered successfully with ID: %d", result.ID)
 	userResponse := mapper.ToUserResponse(result)
 
 	return c.JSON(http.StatusCreated, web.WebResponse{
@@ -72,31 +77,33 @@ func (controller *UserController) Register(c echo.Context) error {
 // @Accept json
 // @Produce json
 // @Param request body request.LoginRequest true "Login credentials"
-// @Success 200 {object} web.WebResponse{data=response.LoginResponse} "Login successful"
-// @Failure 400 {object} web.WebResponse "Invalid request body or validation error"
-// @Failure 401 {object} web.WebResponse "Invalid credentials"
-// @Failure 500 {object} web.WebResponse "Internal server error"
-// @Router /users/login [post]
 func (controller *UserController) Login(c echo.Context) error {
+	log.Println("Request to login user")
 	var req request.LoginRequest
 
 	if err := c.Bind(&req); err != nil {
+		log.Printf("Failed to bind request body: %v", err)
 		return exception.NewCustomError(http.StatusBadRequest, "Invalid request body")
 	}
 
 	if err := c.Validate(&req); err != nil {
+		log.Printf("Validation failed: %v", err)
 		return exception.NewCustomError(http.StatusBadRequest, err.Error())
 	}
 
 	user, err := controller.UserService.Login(req.Email, req.Password)
 	if err != nil {
+		log.Printf("Login failed for email %s: %v", req.Email, err)
 		return err
 	}
 
 	token, err := helper.GenerateToken(user.ID)
 	if err != nil {
+		log.Printf("Failed to generate token: %v", err)
 		return exception.NewCustomError(http.StatusInternalServerError, "Failed to generate token")
 	}
+
+	log.Printf("User logged in successfully with ID: %d", user.ID)
 
 	loginResponse := response.LoginResponse{
 		Token: token,
@@ -121,12 +128,15 @@ func (controller *UserController) Login(c echo.Context) error {
 // @Router /users/me [get]
 func (controller *UserController) GetMe(c echo.Context) error {
 	userID := c.Get("user_id").(int)
+	log.Printf("Request to retrieve user info for ID: %d", userID)
 
 	user, err := controller.UserService.GetById(userID)
 	if err != nil {
+		log.Printf("Failed to retrieve user: %v", err)
 		return err
 	}
 
+	log.Printf("User info retrieved successfully for ID: %d", userID)
 	userResponse := mapper.ToUserResponse(user)
 
 	return c.JSON(http.StatusOK, web.WebResponse{

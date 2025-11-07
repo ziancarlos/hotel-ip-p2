@@ -36,27 +36,34 @@ import (
 // @description Type "Bearer" followed by a space and JWT token.
 
 func main() {
+	log.Println("Initializing application configuration")
 	helper.InitConfig()
+
+	log.Println("Initializing database connection")
 	db := helper.InitDB()
 
+	log.Println("Initializing repositories")
 	userRepository := repository.NewUserRepository()
 	topupRepository := repository.NewTopupRepository()
 	roomTypeRepository := repository.NewRoomTypeRepository()
 	roomRepository := repository.NewRoomRepository()
 	bookRoomRepository := repository.NewBookRoomRepository()
 
+	log.Println("Initializing services")
 	userService := service.NewUserService(userRepository, db)
 	topupService := service.NewTopupService(topupRepository, userRepository, db)
 	roomTypeService := service.NewRoomTypeService(roomTypeRepository, roomRepository, db)
 	roomService := service.NewRoomService(roomRepository, roomTypeRepository, db)
 	bookRoomService := service.NewBookRoomService(bookRoomRepository, roomRepository, userRepository, db)
 
+	log.Println("Initializing controllers")
 	userController := controller.NewUserController(userService)
 	topupController := controller.NewTopupController(topupService)
 	roomTypeController := controller.NewRoomTypeController(roomTypeService)
 	roomController := controller.NewRoomController(roomService)
 	bookRoomController := controller.NewBookRoomController(bookRoomService)
 
+	log.Println("Setting up Echo framework")
 	e := echo.New()
 
 	e.Use(echomiddleware.Logger())
@@ -66,8 +73,10 @@ func main() {
 	e.Validator = helper.NewValidator()
 	e.HTTPErrorHandler = middleware.ErrorHandler
 
+	log.Println("Registering Swagger documentation")
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
+	log.Println("Registering API routes")
 	api := e.Group("/api")
 	route.UserRoutes(api, userController, topupController)
 	route.RoomTypeRoutes(api, roomTypeController)
