@@ -21,6 +21,7 @@ func InitDB() *gorm.DB {
 		dbConfig.SSLMode,
 	)
 
+	log.Println("Initializing database connection with PrepareStmt disabled")
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		PrepareStmt: false,
 	})
@@ -37,6 +38,6 @@ func InitDB() *gorm.DB {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
 
-	log.Println("Successfully connected to database")
+	log.Println("Successfully connected to database with connection pool configured")
 	return db
 }
